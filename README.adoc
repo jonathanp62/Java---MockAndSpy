@@ -1,0 +1,7 @@
+MockAndSpy
+----------
+
+A demonstration of unit testing with JUnit 5 using mocking and spying.
+
+Current version: 0.1.0.
+~~~~~~~~~~~~~~~~~~~~~~~
