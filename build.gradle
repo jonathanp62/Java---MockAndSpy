@@ -77,6 +77,12 @@ dependencies {
 	runtimeOnly			(libs.bundles.logging.runtime)
 
 	testRuntimeOnly		('org.junit.platform:junit-platform-launcher')
+	testRuntimeOnly		('org.junit:jupiter-junit-jupiter')
+	testRuntimeOnly		('org.mockito:mockito-junit-jupiter')
+}
+
+nullaway {
+	annotatedPackages.add('net.jmp.demo.mockito')
 }
 
 tasks.compileJava {
