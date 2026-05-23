@@ -52,11 +52,13 @@ public class PaymentDatabase {
             this.logger.trace(entryWith(accountId));
         }
 
+        final boolean result = accountId.startsWith("000515");
+
         if (this.logger.isTraceEnabled()) {
-            this.logger.trace(exitWith(false));
+            this.logger.trace(exitWith(result));
         }
 
-        return false;
+        return result;
     }
 
     /// Save the transaction

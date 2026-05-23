@@ -65,10 +65,7 @@ public final class Main implements Runnable {
         this.logger.info("Mockito Deom");
 
         this.handleCommandLineArguments();
-
-        /* @todo Run some payment transactions */
-
-        final PaymentService paymentService = new PaymentService(new PaymentDatabase());
+        this.processPayments();
 
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(exit());
@@ -119,6 +116,27 @@ public final class Main implements Runnable {
         logbackLogger.setLevel(level);
 
         this.logger.info("{} level logging enabled for package: {}", level.levelStr, packageName);
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /// Process some payments
+    private void processPayments() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        final PaymentService paymentService = new PaymentService(new PaymentDatabase());
+
+        final String success = paymentService.processPayment("000515123456789", 100.00);
+        final String invalidAccount = paymentService.processPayment("001151123456789", 100.00);
+        final String invalidAmount = paymentService.processPayment("000515123456789", 100_000.01);
+
+        this.logger.info("Success        : {}", success);
+        this.logger.info("Invalid Account: {}", invalidAccount);
+        this.logger.info("Invalid Amount : {}", invalidAmount);
 
         if (this.logger.isTraceEnabled()) {
             this.logger.trace(exit());
