@@ -28,8 +28,21 @@ package net.jmp.demo.mockito;
  * SOFTWARE.
  */
 
-/// The main application class.
+import ch.qos.logback.classic.Level;
+
+import net.jmp.demo.mockito.payments.PaymentDatabase;
+import net.jmp.demo.mockito.payments.PaymentService;
+
+import static net.jmp.util.logging.LoggerUtils.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/// The main application class
 public final class Main implements Runnable {
+    /// The logger.
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+
     /// Any command line arguments.
     private final String[] args;
 
@@ -45,7 +58,71 @@ public final class Main implements Runnable {
     /// The run method.
     @Override
     public void run() {
-        System.out.println("Hello, World!");
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        this.logger.info("Mockito Deom");
+
+        this.handleCommandLineArguments();
+
+        /* @todo Run some payment transactions */
+
+        final PaymentService paymentService = new PaymentService(new PaymentDatabase());
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /// Handle any command line arguments.
+    private void handleCommandLineArguments() {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entry());
+        }
+
+        for (final String arg : this.args) {
+            this.logger.info("Command line argument : {}", arg);
+
+            switch (arg) {
+                case "--log-debug": this.setLogLevel(Level.DEBUG); break;
+                case "--log-error": this.setLogLevel(Level.ERROR); break;
+                case "--log-info": this.setLogLevel(Level.INFO); break;
+                case "--log-off": this.setLogLevel(Level.OFF); break;
+                case "--log-trace": this.setLogLevel(Level.TRACE); break;
+                case "--log-warn": this.setLogLevel(Level.WARN); break;
+                default: throw new IllegalArgumentException("Unknown argument: " + arg);
+            }
+        }
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
+    }
+
+    /// Set the log level.
+    ///
+    /// @param  level   ch.qos.logback.classic.Level
+    private void setLogLevel(final Level level) {
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(entryWith(level));
+        }
+
+        final Class<?> clazz = this.getClass();
+        final String packageName = clazz.getPackage().getName();
+        final Logger packageLogger = LoggerFactory.getLogger(packageName);
+
+        /* Get the Logback logger and change it to the new level */
+
+        ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) packageLogger;
+
+        logbackLogger.setLevel(level);
+
+        this.logger.info("{} level logging enabled for package: {}", level.levelStr, packageName);
+
+        if (this.logger.isTraceEnabled()) {
+            this.logger.trace(exit());
+        }
     }
 
     /// The main application entry point.
