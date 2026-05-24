@@ -52,3 +52,8 @@ logging = [
 logging-runtime = [
     "ch-qos-logback-logback-core"
 ]
+
+testing = [
+    "org-junit-jupiter-junit-jupiter",
+    "org-mockito-mockito-junit-jupiter"
+]

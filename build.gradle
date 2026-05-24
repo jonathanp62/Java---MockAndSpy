@@ -76,9 +76,9 @@ dependencies {
 
 	runtimeOnly			(libs.bundles.logging.runtime)
 
+	testImplementation	(libs.bundles.testing)
+
 	testRuntimeOnly		('org.junit.platform:junit-platform-launcher')
-	testRuntimeOnly		('org.junit:jupiter-junit-jupiter')
-	testRuntimeOnly		('org.mockito:mockito-junit-jupiter')
 }
 
 nullaway {
@@ -94,7 +94,7 @@ tasks.withType(Javadoc).configureEach {
     StandardJavadocDocletOptions sjdo = options as StandardJavadocDocletOptions
 
     cjo.encoding("UTF-8")
-    cjo.addStringOption("source", "24")
+    cjo.addStringOption("source", "26")
     cjo.memberLevel = JavadocMemberLevel.PRIVATE
 
     sjdo.version(true)
@@ -115,4 +115,8 @@ tasks.withType(JavaExec).configureEach {
 }
 
 tasks.register('run', JavaExec) {
+}
+
+tasks.test {
+	useJUnitPlatform()
 }
