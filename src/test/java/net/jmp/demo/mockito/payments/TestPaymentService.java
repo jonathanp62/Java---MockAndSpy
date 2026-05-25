@@ -138,4 +138,61 @@ class TestPaymentService {
         // Extra check: Verify that a specific bad account was never checked
         verify(this.mockDatabase, never()).isValidAccount("999");
     }
+
+    /// Test the payment service with a mocked database object
+    ///
+    /// This test uses argument captor to inspect the internal parameters of the mock
+    /// database object.
+    @Test
+    void testArgumentCaptor_InspectsInternalParameters() {
+        // Arrange
+        when(this.mockDatabase.isValidAccount("789")).thenReturn(true);
+
+        // Act
+        this.paymentServiceWithMock.processPayment("789", 75.50);
+
+        // Assert: Capture the exact double value passed to saveTransaction
+        verify(this.mockDatabase).saveTransaction(eq("789"), this.amountCaptor.capture());
+
+        final double capturedAmount = this.amountCaptor.getValue();
+
+        assertEquals(75.50, capturedAmount);
+    }
+
+    @Test
+    void testSpy_CallsRealMethodsButAllowsStubbing_1() {
+        // Note: spyDatabase is a SPY. By default, it runs the real code in PaymentDatabase.
+        // So, PaymentDatabase.isValidAccount() naturally returns false if the account number
+        // does not start with "000515".
+
+        // Act: Test with default real behavior (returns false -> REJECTED)
+        final String realResult = this.paymentServiceWithSpy.processPayment("any_id", 10.00);
+
+        assertEquals("REJECTED", realResult);
+
+        // Arrange: Stub ONLY one specific method on the spy
+        doReturn(true).when(this.spyDatabase).isValidAccount("trusted_id");
+
+        // Act: Test stubbed behavior on the spy
+        String stubbedResult = this.paymentServiceWithSpy.processPayment("trusted_id", 10.00);
+
+        // Assert
+        assertEquals("SUCCESS", stubbedResult);
+    }
+
+    @Test
+    void testSpy_CallsRealMethodsButAllowsStubbing_2() {
+        // Note: spyDatabase is a SPY. By default, it runs the real code in PaymentDatabase.
+        // So, PaymentDatabase.isValidAccount() naturally returns false if the account number
+        // does not start with "000515".
+
+        // Arrange: Stub ONLY one specific method on the spy - Return false for a valid amount
+        doReturn(false).when(this.spyDatabase).saveTransaction("000515123456789", 10_000.00);
+
+        // Act: Test stubbed behavior on the spy
+        String stubbedResult = this.paymentServiceWithSpy.processPayment("000515123456789", 10_000.00);
+
+        // Assert
+        assertEquals("FAILURE", stubbedResult);
+    }
 }
