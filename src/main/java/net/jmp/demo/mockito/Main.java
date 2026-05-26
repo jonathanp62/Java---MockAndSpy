@@ -146,7 +146,7 @@ public final class Main implements Runnable {
     /// The main application entry point.
     ///
     /// @param  args    java.lang.String[]
-    public static void main(String[] args) {
+    static void main(String[] args) {
         new Main(args).run();
     }
 }

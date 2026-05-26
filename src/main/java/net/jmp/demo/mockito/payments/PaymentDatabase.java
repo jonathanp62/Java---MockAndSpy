@@ -73,7 +73,7 @@ public class PaymentDatabase {
 
         boolean result;
 
-        if (amount <= 100_000.00) {
+        if (amount <= 100_000.00 && amount >= 1.00) {
             this.logger.info("Saved transaction: Account: {}; Amount: {}", accountId, amount);
 
             result = true;
