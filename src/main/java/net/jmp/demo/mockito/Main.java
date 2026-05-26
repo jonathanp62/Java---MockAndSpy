@@ -62,7 +62,7 @@ public final class Main implements Runnable {
             this.logger.trace(entry());
         }
 
-        this.logger.info("Mockito Deom");
+        this.logger.info("Mockito Demo");
 
         this.handleCommandLineArguments();
         this.processPayments();
@@ -82,13 +82,13 @@ public final class Main implements Runnable {
             this.logger.info("Command line argument : {}", arg);
 
             switch (arg) {
-                case "--log-debug": this.setLogLevel(Level.DEBUG); break;
-                case "--log-error": this.setLogLevel(Level.ERROR); break;
-                case "--log-info": this.setLogLevel(Level.INFO); break;
-                case "--log-off": this.setLogLevel(Level.OFF); break;
-                case "--log-trace": this.setLogLevel(Level.TRACE); break;
-                case "--log-warn": this.setLogLevel(Level.WARN); break;
-                default: throw new IllegalArgumentException("Unknown argument: " + arg);
+                case "--log-debug" -> this.setLogLevel(Level.DEBUG);
+                case "--log-error" -> this.setLogLevel(Level.ERROR);
+                case "--log-info" -> this.setLogLevel(Level.INFO);
+                case "--log-off" -> this.setLogLevel(Level.OFF);
+                case "--log-trace" -> this.setLogLevel(Level.TRACE);
+                case "--log-warn" -> this.setLogLevel(Level.WARN);
+                default -> throw new IllegalArgumentException("Unknown argument: " + arg);
             }
         }
 
