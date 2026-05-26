@@ -32,12 +32,16 @@ ch-qos-logback-logback-classic = "1.5.32"
 ch-qos-logback-logback-core = "1.5.32"
 net-jmp-util-logging-logging-utilities = "1.2.0"
 org-jspecify-jspecify = "1.0.0"
+org-junit-jupiter-junit-jupiter = "6.1.0"
+org-mockito-mockito-junit-jupiter = "5.23.0"
 
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback-logback-classic" }
 ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback-logback-core" }
 net-jmp-util-logging-logging-utilities = { module = "net.jmp.util.logging:logging-utilities", version.ref = "net-jmp-util-logging-logging-utilities" }
 org-jspecify-jspecify = { module = "org.jspecify:jspecify", version.ref = "org-jspecify-jspecify" }
+org-junit-jupiter-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "org-junit-jupiter-junit-jupiter" }
+org-mockito-mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "org-mockito-mockito-junit-jupiter" }
 
 [bundles]
 logging = [
@@ -47,4 +51,9 @@ logging = [
 
 logging-runtime = [
     "ch-qos-logback-logback-core"
+]
+
+testing = [
+    "org-junit-jupiter-junit-jupiter",
+    "org-mockito-mockito-junit-jupiter"
 ]
