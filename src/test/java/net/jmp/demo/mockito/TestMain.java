@@ -37,6 +37,9 @@ import ch.qos.logback.core.read.ListAppender;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
+import net.jmp.demo.mockito.payments.PaymentDatabase;
+import net.jmp.demo.mockito.payments.PaymentService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,10 +47,12 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static org.mockito.Mockito.*;
+
 /// The main test class
 class TestMain {
-    /// The main instance
-    private Main main;
+    /// The main constructor
+    private Constructor<Main> mainConstructor;
 
     /// The method
     private Method processPaymentsMethod;
@@ -55,19 +60,17 @@ class TestMain {
     /// The setup method
     @BeforeEach
     void setUp() throws Exception {
-        final Constructor<Main> constructor = Main.class.getDeclaredConstructor(String[].class);
-
-        constructor.setAccessible(true);    // Force the constructor to be accessible
-
-        this.main = constructor.newInstance((Object) new String[] {});
+        this.mainConstructor = Main.class.getDeclaredConstructor(String[].class, PaymentService.class);
         this.processPaymentsMethod = Main.class.getDeclaredMethod("processPayments");
 
+        this.mainConstructor.setAccessible(true);       // Force the constructor to be accessible
         this.processPaymentsMethod.setAccessible(true); // Force the method to be accessible
     }
 
     /// The test process payments method
     @Test
     void testProcessPayments() throws Exception {
+        final Main main = this.mainConstructor.newInstance((Object) new String[] {}, new PaymentService(new PaymentDatabase()));
         final Logger logger = (Logger) LoggerFactory.getLogger(Main.class.getName());   // Get the logger for the Main class
         final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 
@@ -75,7 +78,7 @@ class TestMain {
         logger.addAppender(listAppender);
 
         try {
-            this.processPaymentsMethod.invoke(this.main);
+            this.processPaymentsMethod.invoke(main);
 
             assertTrue(
                     listAppender.list.stream()
@@ -98,5 +101,25 @@ class TestMain {
             logger.detachAppender(listAppender);
             listAppender.stop();
         }
+    }
+
+    /// The test mocked payment service
+    @Test
+    void testMockedPaymentService() throws Exception {
+        final PaymentService paymentService = mock(PaymentService.class);
+
+        when(paymentService.processPayment("000515123456789", 100.00)).thenReturn("SUCCESS");
+        when(paymentService.processPayment("001151123456789", 100.00)).thenReturn("REJECTED");
+        when(paymentService.processPayment("000515123456789", 100_000.01)).thenReturn("FAILURE");
+
+        final Main main = this.mainConstructor.newInstance((Object) new String[] {}, paymentService);
+
+        processPaymentsMethod.invoke(main);
+
+        verify(paymentService, times(1)).processPayment("000515123456789", 100.00);
+        verify(paymentService, times(1)).processPayment("001151123456789", 100.00);
+        verify(paymentService, times(1)).processPayment("000515123456789", 100_000.01);
+
+        verifyNoMoreInteractions(paymentService);
     }
 }
