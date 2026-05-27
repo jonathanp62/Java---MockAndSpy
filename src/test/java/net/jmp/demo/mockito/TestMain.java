@@ -112,7 +112,7 @@ class TestMain {
         when(paymentService.processPayment("001151123456789", 100.00)).thenReturn("REJECTED");
         when(paymentService.processPayment("000515123456789", 100_000.01)).thenReturn("FAILURE");
 
-        final Main main = this.mainConstructor.newInstance((Object) new String[] {}, paymentService);
+        final Main main = this.mainConstructor.newInstance(new String[] {}, paymentService);
 
         processPaymentsMethod.invoke(main);
 
@@ -121,5 +121,46 @@ class TestMain {
         verify(paymentService, times(1)).processPayment("000515123456789", 100_000.01);
 
         verifyNoMoreInteractions(paymentService);
+    }
+
+    /// The test spied payment service
+    @Test
+    void testSpiedPaymentService() throws Exception {
+        final PaymentService paymentService = spy(new PaymentService(new PaymentDatabase()));
+        final Main main = this.mainConstructor.newInstance(new String[] {}, paymentService);
+        final Logger logger = (Logger) LoggerFactory.getLogger(Main.class.getName());   // Get the logger for the Main class
+        final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+
+        doReturn("**success**").when(paymentService).processPayment("000515123456789", 100.00);
+        doReturn("**rejected**").when(paymentService).processPayment("001151123456789", 100.00);
+        doReturn("**failure**").when(paymentService).processPayment("000515123456789", 100_000.01);
+
+        listAppender.start();
+        logger.addAppender(listAppender);
+
+        try {
+            this.processPaymentsMethod.invoke(main);
+
+            assertTrue(
+                    listAppender.list.stream()
+                            .anyMatch(event -> event.getFormattedMessage().contains("Success        : **success**")),
+                    "Expected success payment log message"
+            );
+
+            assertTrue(
+                    listAppender.list.stream()
+                            .anyMatch(event -> event.getFormattedMessage().contains("Invalid Account: **rejected**")),
+                    "Expected rejected payment log message"
+            );
+
+            assertTrue(
+                    listAppender.list.stream()
+                            .anyMatch(event -> event.getFormattedMessage().contains("Invalid Amount : **failure**")),
+                    "Expected failure payment log message"
+            );
+        } finally {
+            logger.detachAppender(listAppender);
+            listAppender.stop();
+        }
     }
 }
