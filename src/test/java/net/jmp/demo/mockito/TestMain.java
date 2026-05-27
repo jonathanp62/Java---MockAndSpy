@@ -70,7 +70,7 @@ class TestMain {
     /// The test process payments method
     @Test
     void testProcessPayments() throws Exception {
-        final Main main = this.mainConstructor.newInstance((Object) new String[] {}, new PaymentService(new PaymentDatabase()));
+        final Main main = this.mainConstructor.newInstance(new String[] {}, new PaymentService(new PaymentDatabase()));
         final Logger logger = (Logger) LoggerFactory.getLogger(Main.class.getName());   // Get the logger for the Main class
         final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 
