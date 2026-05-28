@@ -30,6 +30,8 @@ package net.jmp.demo.mockito.payments;
 
 import static net.jmp.util.logging.LoggerUtils.*;
 
+import java.text.NumberFormat;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,12 +75,14 @@ public class PaymentDatabase {
 
         boolean result;
 
+        final String formattedAmount = NumberFormat.getCurrencyInstance().format(amount);
+
         if (amount <= 100_000.00 && amount >= 1.00) {
-            this.logger.info("Saved transaction: Account: {}; Amount: {}", accountId, amount);
+            this.logger.info("Saved transaction: Account: {}; Amount: {}", accountId, formattedAmount);
 
             result = true;
         } else {
-            this.logger.error("Failed to save transaction: Account: {}; Amount: {}", accountId, amount);
+            this.logger.error("Failed to save transaction: Account: {}; Amount: {}", accountId, formattedAmount);
 
             result = false;
         }
