@@ -46,13 +46,18 @@ public final class Main implements Runnable {
     /// Any command line arguments.
     private final String[] args;
 
+    /// The payment service.
+    private final PaymentService paymentService;
+
     /// The constructor.
     ///
-    /// @param args java.lang.String[]
-    private Main(final String[] args) {
+    /// @param args             java.lang.String[]
+    /// @param paymentService   net.jmp.demo.mockito.payments.PaymentService
+    private Main(final String[] args, final PaymentService paymentService) {
         super();
 
         this.args = args;
+        this.paymentService = paymentService;
     }
 
     /// The run method.
@@ -62,7 +67,7 @@ public final class Main implements Runnable {
             this.logger.trace(entry());
         }
 
-        this.logger.info("Mockito Deom");
+        this.logger.info("Mockito Demo");
 
         this.handleCommandLineArguments();
         this.processPayments();
@@ -82,13 +87,13 @@ public final class Main implements Runnable {
             this.logger.info("Command line argument : {}", arg);
 
             switch (arg) {
-                case "--log-debug": this.setLogLevel(Level.DEBUG); break;
-                case "--log-error": this.setLogLevel(Level.ERROR); break;
-                case "--log-info": this.setLogLevel(Level.INFO); break;
-                case "--log-off": this.setLogLevel(Level.OFF); break;
-                case "--log-trace": this.setLogLevel(Level.TRACE); break;
-                case "--log-warn": this.setLogLevel(Level.WARN); break;
-                default: throw new IllegalArgumentException("Unknown argument: " + arg);
+                case "--log-debug" -> this.setLogLevel(Level.DEBUG);
+                case "--log-error" -> this.setLogLevel(Level.ERROR);
+                case "--log-info" -> this.setLogLevel(Level.INFO);
+                case "--log-off" -> this.setLogLevel(Level.OFF);
+                case "--log-trace" -> this.setLogLevel(Level.TRACE);
+                case "--log-warn" -> this.setLogLevel(Level.WARN);
+                default -> throw new IllegalArgumentException("Unknown argument: " + arg);
             }
         }
 
@@ -128,11 +133,9 @@ public final class Main implements Runnable {
             this.logger.trace(entry());
         }
 
-        final PaymentService paymentService = new PaymentService(new PaymentDatabase());
-
-        final String success = paymentService.processPayment("000515123456789", 100.00);
-        final String invalidAccount = paymentService.processPayment("001151123456789", 100.00);
-        final String invalidAmount = paymentService.processPayment("000515123456789", 100_000.01);
+        final String success = this.paymentService.processPayment("000515123456789", 100.00);
+        final String invalidAccount = this.paymentService.processPayment("001151123456789", 100.00);
+        final String invalidAmount = this.paymentService.processPayment("000515123456789", 100_000.01);
 
         this.logger.info("Success        : {}", success);
         this.logger.info("Invalid Account: {}", invalidAccount);
@@ -146,7 +149,7 @@ public final class Main implements Runnable {
     /// The main application entry point.
     ///
     /// @param  args    java.lang.String[]
-    public static void main(String[] args) {
-        new Main(args).run();
+    static void main(String[] args) {
+        new Main(args, new PaymentService(new PaymentDatabase())).run();
     }
 }
