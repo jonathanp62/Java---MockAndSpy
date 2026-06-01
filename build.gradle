@@ -66,6 +66,12 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+    mockitoAgent {
+        transitive = false
+    }
+}
+
 dependencies {
 	compileOnly 		(libs.org.jspecify.jspecify)
 
@@ -76,7 +82,15 @@ dependencies {
 
 	runtimeOnly			(libs.bundles.logging.runtime)
 
+	testImplementation	(libs.bundles.testing)
+
+	mockitoAgent 		(libs.org.mockito.mockito.core)
+
 	testRuntimeOnly		('org.junit.platform:junit-platform-launcher')
+}
+
+nullaway {
+	annotatedPackages.add('net.jmp.demo.mockito')
 }
 
 tasks.compileJava {
@@ -88,7 +102,7 @@ tasks.withType(Javadoc).configureEach {
     StandardJavadocDocletOptions sjdo = options as StandardJavadocDocletOptions
 
     cjo.encoding("UTF-8")
-    cjo.addStringOption("source", "24")
+    cjo.addStringOption("source", "26")
     cjo.memberLevel = JavadocMemberLevel.PRIVATE
 
     sjdo.version(true)
@@ -109,4 +123,21 @@ tasks.withType(JavaExec).configureEach {
 }
 
 tasks.register('run', JavaExec) {
+}
+
+tasks.test {
+	useJUnitPlatform()
+
+	// Register a cache-compliant provider for JVM arguments
+
+    jvmArgumentProviders.add(new CommandLineArgumentProvider() {
+        @InputFiles
+        @PathSensitive(PathSensitivity.RELATIVE)
+        FileCollection agentFiles = configurations.mockitoAgent
+
+        @Override
+        Iterable<String> asArguments() {
+            return ["-javaagent:${agentFiles.asPath}"]
+        }
+    })
 }
